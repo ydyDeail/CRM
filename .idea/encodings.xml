@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="Encoding" native2AsciiForPropertiesFiles="true" defaultCharsetForPropertiesFiles="UTF-8">
+    <file url="file://$PROJECT_DIR$" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/chance-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/conmmon" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/customer-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/customer-service/src/main/java/org/ydy/controller/CustomerController.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/eureka-server" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/gateway/src/main/resources/static/html/css/style.css" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/gateway/src/main/resources/static/html/footer.html" charset="GBK" />
+    <file url="file://$PROJECT_DIR$/gateway/src/main/resources/static/html/script/common.js" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/jichu-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/service-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/tongji-service" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/user-service" charset="UTF-8" />
+    <file url="PROJECT" charset="UTF-8" />
+  </component>
+</project>

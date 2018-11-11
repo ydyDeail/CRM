@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>jb-aptech毕业设计项目</title>
+	<meta charset="UTF-8">
+<link href="../../css/style.css" rel="stylesheet" type="text/css">
+<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+            var lkm_id=localStorage.getItem("lkm_id");
+            $.ajax({
+                url:"../../../api2/findInfo/"+lkm_id,
+				type:"GET",
+				dataType:"JSON",
+				success:function (obj) {
+					$("#name").val(""+obj.result.lkm_name+"");
+					$("#zhi").val(""+obj.result.lkm_postion+"");
+					$("#phone").val(""+obj.result.lkm_tel+"");
+					$("#tel").val(""+obj.result.lkm_mobile+"");
+					if(obj.result.lkm_memo!=null) {
+                        $("#beizhu").val("" + obj.result.lkm_memo + "");
+                    }
+                    $("#no").val(""+obj.result.lkm_id+"")
+                }
+			});
+        });
+		function baocun() {
+		    var data="{\n\"lkm_id\":"+$("#no").val()+",\n";
+		    var lkm_name=$("#name").val();
+		    if(lkm_name!=null){
+                data+="\"lkm_name\":\""+lkm_name+"\",\n";
+			}
+            var sex=$('input:radio:checked').val();
+                data+="\"lkm_sex\":\""+sex+"\",\n";
+            var lkm_postion=$("#zhi").val();
+            if(lkm_postion!=null){
+                data+="\"lkm_postion\":\""+lkm_postion+"\",\n";
+            }
+            var lkm_tel=$("#phone").val();
+            if(lkm_tel!=null){
+                data+="\"lkm_tel\":\""+lkm_tel+"\",\n";
+            }
+            var lkm_mobile=$("#tel").val();
+            if(lkm_mobile!=null){
+                data+="\"lkm_mobile\":\""+lkm_mobile+"\",\n";
+            }
+            var lkm_memo=$("#beizhu").val();
+            data+="\"lkm_memo\":\""+lkm_memo+"\"\n}";
+            $.ajax({
+                url:"../../../api2/updateLianXi",
+                data:data,
+                type:"POST",
+                contentType:"application/json;charset=utf-8",
+                dataType:"JSON",
+                success:function (obj) {
+                    if(obj.code==0){
+                        alert("修改成功!");
+						to("linkman.html");
+                    }else{
+                        alert(obj.msg);
+                    }
+                }
+            })
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户信息管理 > 客户信息 > 联系人 > 编辑联系人</div>
+<div class="button_bar">
+	<input type="hidden" id="no"/>
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="back();">返回</button>
+	<button class="common_button" onclick="baocun()">保存</button>
+</div>
+<table class="query_form_table" id="table1">
+	<tr>
+		<th>姓名</th>
+		<td><input id="name" readonly name="T3" value="沈聪林" size="20" /><span class="red_star">*</span></td>
+		<th>性别</th>
+		<td>
+			<input type="radio" name="gander" value="男" checked />男
+			<input type="radio" name="gander" value="女" />女
+		</td>
+	</tr>
+	<tr>
+		<th>职位</th>
+		<td><input id="zhi" name="T4" value="总经理" size="20" /><span class="red_star">*</span></td>
+		<th>办公电话</th>
+		<td><input id="phone" name="T5" value="010-68348438-668" size="20" /><span class="red_star">*</span></td>
+	</tr>	
+	<tr>
+		<th>手机</th>
+		<td><input id="tel" name="T1" value="13622883228" size="20" /></td>
+		<th>备注</th>
+		<td><input id="beizhu" value="" name="T2" size="20" /></td>
+	</tr>
+</table>
+</body>
+</html>

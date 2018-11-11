@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>jb-aptech毕业设计项目</title>
+    <meta charset="UTF-8">
+    <link href="../../css/style.css" rel="stylesheet" type="text/css">
+    <script  src="../../script/common.js"></script>
+    <script src="../../../js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url: "../../../api2/areas",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var str = "<option value=\"0\">全部</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        str += "<option value=\"" + obj.result[i].cust_region + "\">" + obj.result[i].cust_region + "</option>";
+                    }
+                    $("#area").append(str);
+                }
+            });
+            $.ajax({
+                url: "../../../api2/levels",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var str = "<option value=\"0\">全部</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        str += "<option value=\"" + obj.result[i].cust_level_label + "\">" + obj.result[i].cust_level_label + "</option>";
+                    }
+                    $("#level").append(str);
+                }
+            });
+            $.ajax({
+                url: "../../../api2/customers",
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        });
+
+        function info(No) {
+            var pageNo = No;
+            var pageSize = $("#pageSize").val();
+            var data = "pageNo=" + No + "&pageSize=" + pageSize;
+            var bh = $("#bh").val();
+            if (bh != null && bh != "") {
+                data += "&cust_no=" + bh;
+            }
+            var mc = $("#mc").val();
+            if (mc != null && mc != "") {
+                data += "&cust_name=" + mc;
+            }
+            var area = $("#area").val();
+            if (area != "全部" && area != 0) {
+                data += "&cust_region=" + area;
+            }
+            var jl = $("#jl").val();
+            if (jl != null && jl != "") {
+                data += "&cust_manager_name=" + jl;
+            }
+            var level = $("#level").val();
+            if (level != "全部" && level != 0) {
+                data += "&cust_level_label=" + level;
+            }
+            $.ajax({
+                url: "../../../api2/customers",
+                data: data,
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        }
+        function xiang(cust_no) {
+            localStorage.setItem("cust_no",cust_no);
+            to("edit.html");
+        }
+        function lianxi(lkm_cust_no,name) {
+            localStorage.setItem("cust_no",lkm_cust_no);
+            localStorage.setItem("name",name);
+            to("linkman.html");
+        }
+        function activity(Atv_cust_no,name) {
+            localStorage.setItem("cust_no",Atv_cust_no);
+            localStorage.setItem("name",name);
+            to("activities.html");
+        }
+        function orders(Atv_cust_no,name) {
+            localStorage.setItem("cust_no",Atv_cust_no);
+            localStorage.setItem("name",name);
+            to('orders.html');
+        }
+        function tables(obj) {
+            var table = $("#table");
+            var str = "<tr><th>序号</th><th>客户编号</th><th>名称</th><th>地区</th><th>客户经理</th><th>客户等级</th><th>操作</th></tr>";
+            for (var i = 0; i < obj.result.list.length; i++) {
+                str += "<tr><td width='50px' class=\"list_data_number\">" + obj.result.list[i].cust_no.substr(10) + "</td> " +
+                    "<td width='70px' class=\"list_data_text\">" + obj.result.list[i].cust_no + "</td> " +
+                    "<td width='100px' class=\"list_data_ltext\">" + obj.result.list[i].cust_name + "</td> " +
+                    "<td width='70px' class=\"list_data_text\">" + obj.result.list[i].cust_region + "</td> " +
+                    "<td width='70px' class=\"list_data_text\">" + obj.result.list[i].cust_manager_name + "</td> " +
+                    "<td width='70px' class=\"list_data_text\">" + obj.result.list[i].cust_level_label + "</td> " +
+                    "<td width='100px' class=\"list_data_op\"> " +
+                    "<img onclick='xiang(\""+obj.result.list[i].cust_no+"\")' title=\"编辑\" src=\"../../images/bt_edit.gif\" class=\"op_button\"/> " +
+                    "<img onclick='lianxi(\""+obj.result.list[i].cust_no+"\",\""+obj.result.list[i].cust_name+"\")' title=\"联系人\" src=\"../../images/bt_linkman.gif\" class=\"op_button\"/> " +
+                    "<img onclick='activity(\""+obj.result.list[i].cust_no+"\",\""+obj.result.list[i].cust_name+"\")' title=\"交往记录\" src=\"../../images/bt_acti.gif\" class=\"op_button\"/> " +
+                    "<img onclick='orders(\""+obj.result.list[i].cust_no+"\",\""+obj.result.list[i].cust_name+"\")' title=\"历史订单\" src=\"../../images/bt_orders.gif\" class=\"op_button\"/> " +
+                    "<img onclick=\"del('“客户：" + obj.result.list[i].cust_name + "”');\" title=\"删除\" src=\"../../images/bt_del.gif\" class=\"op_button\"/> " +
+                    "</td></tr>";
+            }
+            table.empty().append(str);
+
+            str = '<tr>\n' +
+                '        <th colspan="100" class="pager">\n' +
+                '            <div class="pager">\n' +
+                '                共' + obj.result.count + '条记录 每页<input id="pageSize" value=\"' + obj.result.pageSize + '\" size="2"/>条\n' +
+                '                第<input value="' + obj.result.pageNo + '" size="2"/>页/共' + obj.result.pageCount + '页\n' +
+                '                <a href="#" onclick="info(' + 1 + ')">第一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo - 1) + ')">上一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo + 1) + ')">下一页</a>\n' +
+                '                <a href="#" onclick="info(' + obj.result.pageCount + ')">最后一页</a>\n' +
+                '                转到<input value=\''+obj.result.pageNo+'\' id="tiao" size="2"/>页\n' +
+                '                <button width="20" id="go" >GO</button>\n' +
+                '            </div>\n' +
+                '        </th>\n' +
+                '    </tr>';
+            table.append(str);
+            $("#go").click(function () {
+                var tiao=$("#tiao").val();
+                info(tiao);
+            });
+        }
+    </script>
+</head>
+<body>
+
+<div class="page_title">客户信息管理</div>
+<div class="button_bar">
+    <button class="common_button" onclick="help('');">帮助</button>
+    <button class="common_button" onclick="info(1)">查询</button>
+</div>
+<table class="query_form_table">
+    <tr>
+        <th>客户编号</th>
+        <td><input id="bh"/></td>
+        <th>名称</th>
+        <td><input id="mc"/></td>
+        <th>地区</th>
+        <td>
+            <select id="area">
+
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <th>客户经理</th>
+        <td><input id="jl"/></td>
+        <th>客户等级</th>
+        <td>
+            <select id="level">
+
+            </select>
+        </td>
+        <th>　</th>
+        <td>　</td>
+    </tr>
+</table>
+<br/>
+<table class="data_list_table" id="table">
+
+</table>
+</body>
+</html>

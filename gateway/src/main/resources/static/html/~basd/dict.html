@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+	<style>
+		#table tr td{
+			width: 50px;
+		}
+	</style>
+<link href="../css/style.css" rel="stylesheet" type="text/css">
+<script src="../script/common.js"></script>
+	<script src="../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url: "../../../api4/getAllBas",
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        });
+        function info(No) {
+            var pageNo = No;
+            var pageSize = $("#pageSize").val();
+            var data = "pageNo=" + No + "&pageSize=" + pageSize;
+            var dict_type = $("#lei").val();
+            if (dict_type != null && dict_type!= "") {
+                data += "&dict_type=" + dict_type;
+            }
+            var dict_item = $("#tiao").val();
+            if (dict_item != null && dict_item!= "") {
+                data += "&dict_item=" + dict_item;
+            }
+            var dict_value = $("#zhi").val();
+            if (dict_value != null && dict_value!= "") {
+                data += "&dict_value=" + dict_value;
+            }
+            $.ajax({
+                url: "../../../api4/getAllBas",
+                data: data,
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        }
+        function to1(dict_id) {
+            localStorage.setItem("dict_id",dict_id);
+			to('dict_edit.html');
+        }
+        function deleteBas(msg,dict_id) {
+            if (window.confirm("确认删除"+msg+"？")){
+                $.ajax({
+                    url:"../../../api4/deleteBas/"+dict_id,
+                    type:"GET",
+                    success:function (obj) {
+                        if(obj.code==0){
+							alert(msg+"已删除！");
+							reload();
+                        }
+                    }
+                })
+			}
+        }
+        function tables(obj) {
+            var table = $("#table");
+            var str = "<tr>\n" +
+                "\t\t<th>编号</th>\n" +
+                "\t\t<th>类别</th>\n" +
+                "\t\t<th>条目</th>\n" +
+                "\t\t<th>值</th>\n" +
+                "\t\t<th>是否可编辑</th>\n" +
+                "\t\t<th>操作</th>\n" +
+                "\t</tr>";
+            for (var i = 0; i < obj.result.list.length; i++) {
+                var bianji='';
+                if(obj.result.list[i].dict_id_editable==0){
+                    bianji='<td class="list_data_text">否</td>\n' +
+						'\t\t<td class="list_data_op">　</td>\n';
+				}else{
+                    bianji='<td class="list_data_text">是</td>\n' +
+                        '\t\t<td class="list_data_op">\n' +
+                        '\t\t\t<img onclick="to1('+obj.result.list[i].dict_id+');" title="编辑" src="../images/bt_edit.gif" class="op_button" />\n' +
+                        '\t\t\t<img onclick="deleteBas(\''+obj.result.list[i].dict_item+'\',\''+obj.result.list[i].dict_id+'\');" title="删除" src="../images/bt_del.gif" class="op_button" />\n' +
+                        '\t\t</td>\n';
+				}
+
+                str +='<tr>\n' +
+                    '\t\t<td class="list_data_number">'+obj.result.list[i].dict_id+'</td>\n' +
+                    '\t\t<td class="list_data_ltext">'+obj.result.list[i].dict_type+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].dict_item+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].dict_value+'</td>\n'+bianji+'\t</tr>';
+            }
+            table.empty().append(str);
+            str = '<tr>\n' +
+                '        <th colspan="7" class="pager">\n' +
+                '            <div class="pager">\n' +
+                '                共' + obj.result.count + '条记录 每页<input id="pageSize" value=\"' + obj.result.pageSize + '\" size="2"/>条\n' +
+                '                第<input value="' + obj.result.pageNo + '" size="2"/>页/共' + obj.result.pageCount + '页\n' +
+                '                <a href="#" onclick="info(' + 1 + ')">第一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo - 1) + ')">上一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo + 1) + ')">下一页</a>\n' +
+                '                <a href="#" onclick="info(' + obj.result.pageCount + ')">最后一页</a>\n' +
+                '                转到<input value=\''+obj.result.pageNo+'\' id="tiao" size="2"/>页\n' +
+                '                <button width="20" id="go" >GO</button>\n' +
+                '            </div>\n' +
+                '        </th>\n' +
+                '    </tr>';
+            table.append(str);
+            $("#go").click(function () {
+                var tiao=$("#tiao").val();
+                info(tiao);
+            });
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">数据字典管理</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="to('dict_add.html');">新建</button>
+	<button class="common_button" onclick="info(1);">查询</button>
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>类别</th>
+		<td><input id="lei" /></td>
+		<th>条目</th>
+		<td><input id="tiao" /></td>
+		<th>值</th>
+		<td><input id="zhi" /></td>
+	</tr>
+</table>
+<br />
+<table id="table" class="data_list_table">
+
+</table>
+</body>
+</html>

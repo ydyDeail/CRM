@@ -1,0 +1,204 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+<link href="../css/style.css" rel="stylesheet" type="text/css">
+<script src="../script/common.js"></script>
+	<script src="../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		var userId=0;
+		$(function () {
+            var token=localStorage.getItem("token");
+            var url="../../../api3/getUser?token="+token;
+            $.ajax({
+                url:url,
+                type:"GET",
+                success:function (obj) {
+                    if(obj.code==2){
+                        alert("token失败");
+                        to("login.html");
+                    }else{
+                        $("#names").val(obj.result);
+                        $.ajax({
+                            url:"../../../api3/findUser/"+$("#names").val(),
+                            type:"GET",
+                            success:function (obj2) {
+                                userId=obj2.result;
+                            }
+                        });
+                    }
+                }
+            });
+			$.ajax({
+				url:"../../../api3/custname",
+				type:"GET",
+				success:function (obj) {
+                    var str="<option>请选择...</option>";
+                    for(var i=0;i<obj.result.length;i++){
+                        str+="<option>"+obj.result[i].cust_name+"</option>"
+					}
+					$("#custname").empty().append(str);
+                }
+			});
+            $.ajax({
+                url:"../../../api3/chances",
+                type:"GET",
+                success:function (obj) {
+                    $("#No").val((obj.result.count+1));
+                }
+            });
+            $.ajax({
+                url:"../../../api3/lkmname",
+                type:"GET",
+                success:function (obj) {
+                    var str="<option>请选择...</option>";
+                    for(var i=0;i<obj.result.length;i++){
+                        str+="<option value='"+i+"'>"+obj.result[i].lkm_name+"</option>"
+                    }
+                    $("#lkmname").empty().append(str);
+                }
+            });
+            $.ajax({
+                url:"../../../api3/manegers",
+                type:"GET",
+                dataType:"JSON",
+                success:function (obj2) {
+                    var str="<option value='0'>请选择...</option>";
+                    for(var i=0;i<obj2.result.length;i++){
+                            str+="<option value='"+obj2.result[i].cust_manager_id+"'>"+obj2.result[i].cust_manager_name+"</option>"
+                        $("#manegers").empty().append(str);
+                    }
+                }
+            });
+            $("#lkmname").change(function () {
+                if($("#lkmname").find("option:selected").text()!="请选择..."){
+                    var index=$("#lkmname").val();
+                    $.ajax({
+                        url:"../../../api3/lkmname",
+                        type:"GET",
+                        success:function (obj) {
+                            for(var i=0;i<=index;i++){
+                                $("#phone").val(obj.result[index].lkm_mobile);
+                            }
+                        }
+                    });
+                }else{
+                    $("#phone").val("");
+				}
+            })
+        });
+		function baocun() {
+		    var chc_create_by=$("#names").val(); //用户名
+		    //用户ID
+			var chc_cust_name=$("#custname").find("option:selected").text(); //客户名称
+			var chc_desc=$("#miaoshu").html();  //机会描述
+			var chc_due_id=$("#manegers").val(); //经理ID
+			var chc_due_to=$("#manegers").find("option:selected").text(); //经理名称
+			var chc_linkman=$("#lkmname").find("option:selected").text(); //联系人
+			var chc_rate=$("#lv").val(); //成功几率
+			var chc_source=$("#jihui").val(); //机会来源
+			var chc_tel=$("#phone").val(); //联系人电话
+			var chc_title=$("#gai").val(); //概要
+			var data="{\n\"chc_create_by\":\""+chc_create_by+"\",\n\"chc_create_id\":"+userId+",\n";
+			if(chc_cust_name!="请选择..."){
+			    data+="\"chc_cust_name\":\""+chc_cust_name+"\",\n";
+			}
+			data+="\"chc_desc\":\""+chc_desc+"\",\n";
+			if(chc_due_to!="请选择..."){
+			    data+="\"chc_due_id\":"+chc_due_id+",\n\"chc_due_to\":\""+chc_due_to+"\",\n";
+			}
+			if(chc_linkman!="请选择..."){
+			    data+="\"chc_linkman\":\""+chc_linkman+"\",\n\"chc_tel\":\""+chc_tel+"\",\n"
+			}
+			if(chc_rate!=""){
+			    data+="\"chc_rate\":\""+chc_rate+"\",\n"
+			}
+			if(chc_title!=""){
+			    data+="\"chc_title\":\""+chc_title+"\",\n"
+			}
+			data+="}";
+            $.ajax({
+                url:"../../../api3/addChance",
+                type:"POST",
+				data:data,
+				dataType:"JSON",
+				contentType:"application/json;charset=utf-8",
+                success:function (obj) {
+                    if(obj.code==0){
+                        alert("添加成功！");
+                        to("list.html");
+					}else{
+                        alert(obj.msg);
+					}
+                }
+            });
+        }
+	</script>
+
+</head>
+<body>
+
+<div class="page_title">销售机会管理&nbsp; &gt; 新建销售机会</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="back();">返回</button>
+	<button class="common_button" onclick="baocun();">保存</button>
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>编号</th>
+		<td><input id="No" readonly /></td>
+		<th>机会来源</th>
+		<td>
+			<input id="jihui" name="T4" size="20" /></td>
+	</tr>
+	<tr>
+		<th>客户名称</th>
+		<td><select id="custname" name="D1">
+
+		</select> <span class="red_star">*</span></td>
+		<th>成功机率</th>
+		<td><input id="lv" /><span class="red_star">*</span></td>
+	</tr>	
+	<tr>
+		<th>概要</th>
+		<td colspan="3"><input id="gai" name="T0" size="52" /><span class="red_star">*</span></td>
+	</tr>
+	<tr>
+		<th>联系人</th>
+		<td><select id="lkmname" name="T21">
+
+		</select> <span class="red_star">*</span></td>
+		<th>联系人电话</th>
+		<td><input id="phone" name="T5" size="20" /></td>
+	</tr>
+	<tr>
+		<th>机会描述</th>
+		<td colspan="3"><textarea id="miaoshu" rows="6" cols="50" name="S1"></textarea><span class="red_star">*</span></td>
+	</tr>
+	<tr>
+		<th>创建人</th>
+		<td><input id="names" name="T19" value="刘颖" readonly size="20" /><span class="red_star">*</span></td>
+		<th>创建时间</th>
+		<td><input id="t1" name="T15" readonly size="20" /><span class="red_star">*</span></td>
+	</tr>
+</table>
+<br />
+<table disabled class="query_form_table" id="table1">
+	<tr>
+		<th>指派给</th>
+		<td>
+			<select id="manegers" name="D1">
+			</select> <span class="red_star">*</span></td>
+		<th>指派时间</th>
+		<td>
+			<input id="t2" name="T20" readonly size="20" /><span class="red_star">*</span></td>
+	</tr>
+</table>
+<script>
+	setCurTime('t1');
+	setCurTime('t2');
+</script>
+</body>
+</html>

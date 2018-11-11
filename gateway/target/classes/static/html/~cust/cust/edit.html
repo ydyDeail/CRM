@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>jb-aptech毕业设计项目</title>
+    <meta charset="UTF-8">
+    <link href="../../css/style.css" rel="stylesheet" type="text/css">
+    <script src="../../script/common.js"></script>
+    <script src="../../../js/jquery-1.8.3.js"></script>
+    <script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url: "../../../api2/areas",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var cust_region=localStorage.getItem("cust_region");
+                    var str = "<option value=\"0\">请选择...</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        if (obj.result[i].cust_region == cust_region) {
+                            str += "<option  selected >" + obj.result[i].cust_region + "</option>";
+                        } else {
+                            str += "<option>" + obj.result[i].cust_region + "</option>";
+                        }
+                    }
+                    $("#area").append(str);
+                }
+            });
+            $.ajax({
+                url: "../../../api2/levels",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var str = "<option value=\"0\">请选择...</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        if (obj.result[i].cust_level_label == localStorage.getItem("cust_level_label")) {
+                            str += "<option  selected  value='"+obj.result[i].cust_level+"'>" + obj.result[i].cust_level_label + "</option>";
+                        } else {
+                            str += "<option  value='"+obj.result[i].cust_level+"'>" + obj.result[i].cust_level_label + "</option>";
+                        }
+                    }
+                    $("#level").append(str);
+                }
+            });
+            $.ajax({
+                url: "../../../api2/manegers",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var cust_manager_name=localStorage.getItem("cust_manager_name");
+                    var str = "<option value=\"0\">请选择...</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        if (obj.result[i].cust_manager_name==cust_manager_name) {
+                            str += "<option  selected value='"+obj.result[i].cust_manager_id+"'>" + obj.result[i].cust_manager_name + "</option>";
+                        } else {
+                            str += "<option value='"+obj.result[i].cust_manager_id+"'>" + obj.result[i].cust_manager_name + "</option>";
+                        }
+                    }
+                    $("#maneger").append(str);
+                }
+            });
+            var cust_no=localStorage.getItem("cust_no");
+            $.ajax({
+                url: "../../../api2/customers/"+cust_no,
+                type: "GET",
+                success: function (obj) {
+                    $("#cust_no").html(obj.result.cust_no);
+                    $("#names").val(obj.result.cust_name);
+                    localStorage.setItem("cust_region",obj.result.cust_region);
+                    localStorage.setItem("cust_level_label",obj.result.cust_level_label);
+                    localStorage.setItem("cust_manager_name",obj.result.cust_manager_name);
+                    $("#add").val(obj.result.cust_addr);
+                    $("#you").val(obj.result.cust_zip);
+                    $("#tel").val(obj.result.cust_tel);
+                    $("#chuan").val(obj.result.cust_fax);
+                    $("#wang").val(obj.result.cust_website);
+                    $("#fa").val(obj.result.cust_chieftain);
+                    $("#yinhang").val(obj.result.cust_bank);
+                    $("#zhanghao").val(obj.result.cust_bank_account);
+                }
+            });
+        });
+        function update() {
+            var cust_no=localStorage.getItem("cust_no"); //客户编号
+            var cust_turnover=$("#yye").val(); //营业额
+            var cust_local_tax_no=$("#ds").val(); //地税
+            var cust_national_tax_no=$("#gs").val(); //国税
+            var cust_level_label=$("#level").find("option:selected").text(); //客户等级
+            var cust_manager_name=$("#maneger").find("option:selected").text(); //经理名称
+            var cust_manager_id=$("#maneger").val(); //经理ID
+            var cust_level=$("#level").val(); //客户等级ID
+            var data="{\n\"cust_no\": \""+cust_no+"\",\n";
+            var cust_name=$("#names").val(); //客户名字
+            if(cust_name!=""){
+                data+="\"cust_name\":\""+cust_name+"\",\n";
+            }
+            var cust_region=$("#area").val(); //地区
+            if(cust_region!="请选择..."){
+                data+="\"cust_region\":\""+cust_region+"\",\n";
+            }
+            if(cust_level_label!="请选择..."){
+                if(cust_manager_name!="请选择..."){
+                    data+="\"cust_manager_id\":"+cust_manager_id+",\n";
+                }
+                data+="\"cust_level\":"+cust_level+",\n";
+                data+="\"cust_level_label\":\""+cust_level_label+"\",\n";
+
+            }
+            var cust_satisfy=$("#manyi").val(); //满意度
+            if(cust_satisfy!=0){
+                data+="\"cust_satisfy\":"+cust_satisfy+",\n";
+            }
+            var cust_credit=$("#xinyong").val(); //信用度
+            if(cust_credit!=0){
+                data+="\"cust_credit\":"+cust_credit+",\n";
+            }
+            var cust_addr=$("#add").val(); //地址
+            if(cust_addr!="") {
+                data += "\"cust_addr\":\"" + cust_addr + "\",\n";
+            }
+            var cust_zip=$("#you").val(); //邮箱编号
+            if(cust_zip!=""){
+                data += "\"cust_zip\":\"" + cust_zip + "\",\n";
+            }
+            var cust_tel=$("#tel").val(); //电话
+            if(cust_tel!=""){
+                data += "\"cust_tel\":\"" + cust_tel + "\",\n";
+            }
+            var cust_fax=$("#chuan").val(); //传真
+            if(cust_fax!=""){
+                data += "\"cust_fax\":\"" + cust_fax + "\",\n";
+            }
+            var cust_website=$("#wang").val(); //网站
+            if(cust_website!=""){
+                data += "\"cust_website\":\"" + cust_website + "\",\n";
+            }
+            var cust_licence_no=$("#yingye").val(); //营业执照注册号
+            if(cust_licence_no!=""){
+                data += "\"cust_licence_no\":\"" + cust_licence_no + "\",\n";
+            }
+            var cust_chieftain=$("#fa").val(); //法人
+            if(cust_chieftain!=""){
+                data += "\"cust_chieftain\":\"" + cust_chieftain + "\",\n";
+            }
+            var cust_bankroll=$("#zhuzi").val(); //注册资金
+            if(cust_bankroll!=""){
+                data += "\"cust_bankroll\":\"" + cust_bankroll + "\",\n";
+            }
+            data += "\"cust_turnover\":\"" + cust_turnover + "\",\n";
+            var cust_bank=$("#yinhang").val(); //开户银行
+            if(cust_bank!=""){
+                data += "\"cust_bank\":\"" + cust_bank + "\",\n";
+            }
+            var cust_bank_account=$("#zhanghao").val(); //银行账号
+            if(cust_bank_account!=""){
+                data += "\"cust_bank_account\":\"" + cust_bank_account + "\",\n";
+            }
+            data += "\"cust_local_tax_no\":\"" + cust_local_tax_no + "\",\n";
+            data += "\"cust_national_tax_no\":\"" + cust_national_tax_no + "\",\n";
+            data += "\"cust_status\":1,\n";
+            if(cust_manager_name!="请选择..."){
+                data += "\"cust_manager_name\":\"" + cust_manager_name + "\"\n";
+            }
+            data+="}";
+            localStorage.setItem("data",data);
+            $.ajax({
+                url:"../../../api2/updateCustomer",
+                data:data,
+                type:"POST",
+                contentType:"application/json;charset=utf-8",
+                dataType:"JSON",
+                success:function (obj) {
+                    if(obj.result=="OK"){
+                        alert("修改成功")
+                        to("list.html");
+                    }else{
+                        alert(obj.msg);
+                    }
+                }
+            });
+
+        }
+    </script>
+</head>
+<body>
+
+<div class="page_title">客户信息管理 > 客户信息</div>
+<div class="button_bar">
+    <button class="common_button" onclick="help('');">帮助</button>
+    <button class="common_button" onclick="to('linkman.html');">联系人</button>
+    <button class="common_button" onclick="to('activities.html');">交往记录</button>
+    <button class="common_button" onclick="to('orders.html');">历史订单</button>
+
+    <button class="common_button" onclick="back();">返回</button>
+    <button class="common_button" onclick="update()">保存</button>
+</div>
+<table class="query_form_table">
+    <tr>
+        <th>客户编号</th>
+        <td id="cust_no">KH071202001</td>
+        <th>名称</th>
+        <td><input id="names" /><span class="red_star">*</span></td>
+    </tr>
+    <tr>
+        <th>地区</th>
+        <td>
+            <select id="area">
+
+            </select>
+            <span class="red_star">*</span></td>
+        <th>客户经理</th>
+        <td>
+            <select id="maneger">
+
+            </select><span class="red_star">*</span>
+        </td>
+    </tr>
+    <tr>
+        <th>客户等级</th>
+        <td>
+            <select id="level">
+
+            </select><span class="red_star">*</span>
+        </td>
+        <th>　</th>
+        <td>　</td>
+    </tr>
+    <tr>
+        <th>客户满意度</th>
+        <td>
+            <select id="manyi">
+                <option value="0">未指定</option>
+                <option value="5">☆☆☆☆☆</option>
+                <option value="4">☆☆☆☆</option>
+                <option value="3" selected="selected">☆☆☆</option>
+                <option value="2">☆☆</option>
+                <option value="1">☆</option>
+            </select><span class="red_star">*</span>
+        </td>
+        <th>客户信用度</th>
+        <td>
+            <select id="xinyong">
+                <option value="0">未指定</option>
+                <option value="5">☆☆☆☆☆</option>
+                <option value="4">☆☆☆☆</option>
+                <option value="3" selected="selected">☆☆☆</option>
+                <option value="2">☆☆</option>
+                <option value="1">☆</option>
+            </select><span class="red_star">*</span>
+        </td>
+    </tr>
+</table>
+<br/>
+<table class="query_form_table" id="table1">
+    <tr>
+        <th>地址</th>
+        <td><input id="add" value="北京市海淀区成府路702号"/><span class="red_star">*</span>
+        </td>
+        <th>邮政编码</th>
+        <td><input id="you" value="100027" name="T1" size="20"/><span class="red_star">*</span></td>
+    </tr>
+    <tr>
+        <th>电话</th>
+        <td>
+            <input id="tel" value="010-62283393" name="T4" size="20"/><span class="red_star">*</span></td>
+        <th>传真</th>
+        <td>
+            <input id="chuan" value="010-62283396" name="T5" size="20"/><span class="red_star">*</span>
+        </td>
+    </tr>
+    <tr>
+        <th>网址</th>
+        <td>
+            <input id="wang" value="www.conghai.com" name="T6" size="20"/><span class="red_star">*</span>
+        </td>
+        <th>　</th>
+        <td>　</td>
+    </tr>
+</table>
+<br/>
+<table class="query_form_table" id="table2">
+    <tr>
+        <th>营业执照注册号</th>
+        <td><input id="yingye" value="" name="T13" size="20"/></td>
+        <th>法人</th>
+        <td><input id="fa" value="聪颖" name="T3" size="20"/><span class="red_star">*</span>
+        </td>
+    </tr>
+    <tr>
+        <th>注册资金（万元）</th>
+        <td>
+            <input id="zhuzi" value="" name="T7" size="20"/></td>
+        <th>年营业额</th>
+        <td>
+            <input id="yye" value="" name="T8" size="20"/>
+        </td>
+    </tr>
+    <tr>
+        <th>开户银行</th>
+        <td>
+            <input id="yinhang" value="北京银行 中关村支行" name="T9" size="20"/><span class="red_star">*</span>
+        </td>
+        <th>银行帐号</th>
+        <td><input id="zhanghao" value="62258827238382838" name="T10" size="20"/><span class="red_star">*</span></td>
+    </tr>
+    <tr>
+        <th>地税登记号</th>
+        <td>
+            <input id="ds" value="" name="T11" size="20"/></td>
+        <th>国税登记号</th>
+        <td><input id="gs" value="" name="T12" size="20"/></td>
+    </tr>
+</table>
+<p>　</p>
+</body>
+</html>

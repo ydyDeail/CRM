@@ -1,0 +1,142 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+	<style>
+		#table tr td{
+			width: 50px;
+		}
+	</style>
+<link href="../../css/style.css" rel="stylesheet" type="text/css">
+<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+            $.ajax({
+                url: "../../../api2/getLost?Lst_status=",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+					tables(obj);
+                }
+            });
+        });
+        function info(No) {
+            var pageNo = No;
+            var pageSize = $("#pageSize").val();
+            var data = "pageNo=" + No + "&pageSize=" + pageSize;
+            var lst_cust_name = $("#name").val();
+            if (lst_cust_name != null && lst_cust_name != "") {
+                data += "&lst_cust_name=" + lst_cust_name;
+            }
+            var lst_manager_name = $("#manager").val();
+            if (lst_manager_name != null && lst_manager_name != "") {
+                data += "&lst_manager_name=" + lst_manager_name;
+            }
+            var lst_status = $("#status").find("option:selected").text();
+            if (lst_status != "全部") {
+                data += "&lst_status=" + lst_status;
+            }else{
+                data += "&lst_status=" + "";
+			}
+            $.ajax({
+                url: "../../../api2/getLost",
+                data: data,
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        }
+        function queren(lst_id) {
+            localStorage.setItem("lst_id",lst_id);
+            to('confirm.html');
+        }
+        function zanhuan(lst_id) {
+            localStorage.setItem("lst_id",lst_id);
+            to('relay.html');
+        }
+        function tables(obj) {
+            var table = $("#table");
+            var str = "<tr>\n" +
+                "\t\t<th>编号</th>\n" +
+                "\t\t<th>客户</th>\n" +
+                "\t\t<th>客户经理</th>\n" +
+                "\t\t<th>上次下单时间</th>\n" +
+                "\t\t<th>确认流失时间</th>\n" +
+                "\t\t<th>状态</th>\n" +
+                "\t\t<th>操作</th>\n" +
+                "\t</tr>";
+            for (var i = 0; i < obj.result.list.length; i++) {
+                var lostTime="";
+                if(obj.result.list[i].Lst_lost_date!=null){
+                    lostTime=obj.result.list[i].Lst_lost_date;
+				}
+                str += "<tr>\n" +
+                    "\t\t<td class=\"list_data_number\">"+obj.result.list[i].lst_id+"</td>\n" +
+                    "\t\t<td class=\"list_data_text\">"+obj.result.list[i].lst_cust_name+"</td>\n" +
+                    "\t\t<td class=\"list_data_ltext\">"+obj.result.list[i].lst_manager_name+"</td>\n" +
+                    "\t\t<td class=\"list_data_text\">"+obj.result.list[i].lst_last_order_date+"</td>\n" +
+                    "\t\t<td class=\"list_data_text\">"+lostTime+"</td>\n" +
+                    "\t\t<td class=\"list_data_text\">"+obj.result.list[i].lst_status+"</td>\n" +
+                    "\t\t<td class=\"list_data_op\">\n" +
+                    "\t\t\t<img onclick='queren("+obj.result.list[i].lst_id+")' title=\"确认流失\" src=\"../../images/bt_confirm.gif\" class=\"op_button\" />\n" +
+                    "\t\t\t<img onclick='zanhuan("+obj.result.list[i].lst_id+")' title=\"暂缓流失\" src=\"../../images/bt_relay.gif\" class=\"op_button\" />\n" +
+                    "\t\t\t\n" +
+                    "\t\t</td>\n" +
+                    "\t</tr>";
+            }
+            table.empty().append(str);
+
+            str = '<tr>\n' +
+                '        <th colspan="100" class="pager">\n' +
+                '            <div class="pager">\n' +
+                '                共' + obj.result.count + '条记录 每页<input id="pageSize" value=\"' + obj.result.pageSize + '\" size="2"/>条\n' +
+                '                第<input value="' + obj.result.pageNo + '" size="2"/>页/共' + obj.result.pageCount + '页\n' +
+                '                <a href="#" onclick="info(' + 1 + ')">第一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo - 1) + ')">上一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo + 1) + ')">下一页</a>\n' +
+                '                <a href="#" onclick="info(' + obj.result.pageCount + ')">最后一页</a>\n' +
+                '                转到<input value=\''+obj.result.pageNo+'\' id="tiao" size="2"/>页\n' +
+                '                <button width="20" id="go" >GO</button>\n' +
+                '            </div>\n' +
+                '        </th>\n' +
+                '    </tr>';
+            table.append(str);
+            $("#go").click(function () {
+                var tiao=$("#tiao").val();
+                info(tiao);
+            });
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户流失管理</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="info(1)">查询</button>
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>客户</th>
+		<td><input id="name" /></td>
+		<th>客户经理</th>
+		<td><input id="manager" /></td>
+		<th>状态</th>
+		<td>
+			<select id="status">
+				<option>全部</option>
+				<option>预警</option>
+				<option>暂缓流失</option>
+				<option>确认流失</option>
+			</select>
+		</td>
+	</tr>
+	</table>
+<br />
+<table id="table" class="data_list_table">
+</table>
+</body>
+</html>

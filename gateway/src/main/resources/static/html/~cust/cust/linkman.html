@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>jb-aptech毕业设计项目</title>
+	<meta charset="UTF-8">
+	<link href="../../css/style.css" rel="stylesheet" type="text/css">
+	<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+			var lkm_cust_no=localStorage.getItem("cust_no");
+			$("#no").html(lkm_cust_no);
+			var name=localStorage.getItem("name");
+			$("#names").html(name);
+			$.ajax({
+				url:"../../../api2/findLianXi/"+lkm_cust_no,
+				type:"GET",
+				dataType:"JSON",
+				success:function (obj) {
+					var str="\t<tr>\n" +
+						"\t\t<th>姓名</th>\n" +
+						"\t\t<th>性别</th>\n" +
+						"\t\t<th>职位</th>\n" +
+						"\t\t<th>办公电话</th>\n" +
+						"\t\t<th>手机</th>\n" +
+						"\t\t<th>备注</th>\n" +
+						"\t\t<th>操作</th>\n" +
+						"\t</tr>";
+					for(var i=0;i<obj.result.length;i++){
+						str+="<tr>\n" +
+							"<td class=\"list_data_text\">"+obj.result[i].lkm_name+"</td>\n" +
+							"<td class=\"list_data_ltext\">"+obj.result[i].lkm_sex+"</td>\n" +
+							"<td class=\"list_data_text\">"+obj.result[i].lkm_postion+"</td>\n" +
+							"<td class=\"list_data_text\">"+obj.result[i].lkm_tel+"</td>\n" +
+							"<td class=\"list_data_text\">"+obj.result[i].lkm_mobile+"</td>\n" +
+							"<td class=\"list_data_op\">\n" +
+							"</td>\n" +
+							"<td class=\"list_data_op\">\n" +
+							"<img onclick=\"info('"+obj.result[i].lkm_id+"');\" title=\"编辑\" src=\"../../images/bt_edit.gif\" class=\"op_button\" />\n" +
+							"<img onclick=\"del('“联系人：沈聪林”');\" title=\"删除\" src=\"../../images/bt_del.gif\" class=\"op_button\" />\n" +
+							"</td></tr>"
+					}
+					$("#table").append(str);
+				}
+			})
+		});
+        function info(id) {
+            localStorage.setItem("lkm_id",id);
+            to("linkman_edit.html");
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户信息管理 > 客户信息 > 联系人 </div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="to('linkman_add.html');">新建</button>  
+	<button class="common_button" onclick="back();">返回</button>  
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>客户编号</th>
+		<td id="no">KH071202001</td>
+		<th>客户名称</th>
+		<td id="names">聪海信息科技有限公司</td>
+	</tr>
+	</table>
+<br />
+<table class="data_list_table" id="table">
+
+
+	</table>
+</body>
+</html>

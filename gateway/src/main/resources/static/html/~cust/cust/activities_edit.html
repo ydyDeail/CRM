@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>jb-aptech毕业设计项目</title>
+	<meta charset="UTF-8">
+<link href="../../css/style.css" rel="stylesheet" type="text/css">
+<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        var atv_id=localStorage.getItem("atv_id");
+        $(function () {
+            $.ajax({
+                url:"../../../api2/findAInfo/"+atv_id,
+                type:"GET",
+                dataType:"JSON",
+                success:function (obj) {
+                    $("#time").val(obj.result.atv_date);
+                    $("#add").val(obj.result.atv_place);
+                    $("#gai").val(obj.result.atv_title);
+                    $("#xiang").val(obj.result.atv_desc);
+                }
+            });
+        });
+        function baocun() {
+            var data="{\n\"atv_id\":"+atv_id+",\n";
+            var atv_date=$("#time").val();
+            if(atv_date!=""){
+                var str1=atv_date.replace("年","-");
+                var str2=str1.replace("月","-");
+                var str3 =str2.replace("日","");
+                data+="\"atv_date\":\""+str3+"\",\n";
+			}
+            var atv_desc=$("#xiang").val();
+            if(atv_desc!=""){
+                data+="\"atv_desc\":\""+atv_desc+"\",\n";
+			}
+            var atv_place=$("#add").val();
+            if(atv_place!=""){
+                data+="\"atv_place\":\""+atv_place+"\",\n";
+			}
+            var atv_title=$("#gai").val();
+            if(atv_title!=""){
+                data+="\"atv_title\":\""+atv_title+"\",\n";
+			}
+            var atv_beizhu=$("#beizhu").val();
+            data+="\"atv_beizhu\":\""+atv_beizhu+"\"\n}";
+            $.ajax({
+                url:"../../../api2/updateActivity",
+                data:data,
+                type:"POST",
+                contentType:"application/json;charset=utf-8",
+                dataType:"JSON",
+                success:function (obj) {
+                    if(obj.code==0){
+                        alert("修改成功!");
+                        to("activities.html");
+                    }else{
+                        alert(obj.msg);
+                    }
+                }
+            })
+        }
+        </script>
+</head>
+<body>
+
+<div class="page_title">客户信息管理 &gt; 客户信息 &gt; 交往记录 &gt; 编辑交往记录</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="back();">返回</button>
+	<button class="common_button" onclick="baocun();">保存</button>
+</div>
+<table class="query_form_table" id="table1">
+	<tr>
+		<th>时间</th>
+		<td><input id="time" name="T2" value="2007年10月09日" size="20" /><span class="red_star">*</span></td>
+		<th>地点</th>
+		<td>
+			<input id="add" name="T1" value="友谊宾馆" size="20" /><span class="red_star">*</span></td>
+	</tr>
+	<tr>
+		<th>概要</th>
+		<td><input id="gai" name="T3" value="签订意向协议" size="20" /><span class="red_star">*</span></td>
+		<th>备注</th>
+		<td><input id="beizhu" name="T4" size="20" /></td>
+	</tr>	
+	<tr>
+		<th>详细信息</th>
+		<td colspan="3">
+			<textarea id="xiang" cols="50" rows="6" name="S1">...</textarea>
+		</td>
+	</tr>
+</table>
+</body>
+</html>

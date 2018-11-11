@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<title>jb-aptech毕业设计项目</title>
+	<meta charset="UTF-8">
+	<link href="../../css/style.css" rel="stylesheet" type="text/css">
+	<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        $(function () {
+                var Atv_cust_no=localStorage.getItem("cust_no");
+                $("#no").html(Atv_cust_no);
+                var name=localStorage.getItem("name");
+                $("#names").html(name);
+                $.ajax({
+                    url:"../../../api2/findActivity/"+Atv_cust_no,
+                    type:"GET",
+                    dataType:"JSON",
+                    success:function (obj) {
+                        var str="<tr>\n" +
+                            "\t\t<th width=\"232\">时间</th>\n" +
+                            "\t\t<th>地点</th>\n" +
+                            "\t\t<th>概要</th>\n" +
+                            "\t\t<th>详细信息</th>\n" +
+                            "\t\t<th>备注</th>\n" +
+                            "\t\t<th>操作</th>\n" +
+                            "\t</tr>";
+                    	for(var i=0;i<obj.result.length;i++){
+                    	    var beizhu;
+                    	    if(obj.result[i].atv_beizhu==null){
+                    	        beizhu="";
+							}else{
+                    	        beizhu=obj.result[i].atv_beizhu;
+							}
+                    	    str+="<tr>\n" +
+                                "<td class=\"list_data_text\" width=\"230\">"+setCurTime2(obj.result[i].atv_date)+"</td>\n" +
+                                "<td class=\"list_data_text\">"+obj.result[i].atv_place+"</td>\n" +
+                                "<td class=\"list_data_ltext\">"+obj.result[i].atv_title+"</td>\n" +
+                                "<td class=\"list_data_ltext\">"+obj.result[i].atv_desc+"</td>\n" +
+                                "<td class=\"list_data_op\">"+beizhu+"</td>\n" +
+                                "<td class=\"list_data_op\">\n" +
+                                "<img onclick=\"update('"+obj.result[i].atv_id+"')\" title=\"编辑\" src=\"../../images/bt_edit.gif\" class=\"op_button\" />\n" +
+                                "<img onclick=\"del('“交往记录：签订意向协议”');\" title=\"删除\" src=\"../../images/bt_del.gif\" class=\"op_button\" />\n" +
+                                "</td></tr>";
+                    	}
+                    	$("#tables").append(str);
+                    }
+            });
+        });
+        function update(atv_id) {
+			localStorage.setItem("atv_id",atv_id);
+            to('activities_edit.html');
+        }
+        </script>
+</head>
+<body>
+<div class="page_title">客户信息管理 &gt; 客户信息 &gt; 交往记录</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="to('activities_add.html');">新建</button>  
+	<button class="common_button" onclick="back();">返回</button>  
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>客户编号</th>
+		<td id="no">KH071202001</td>
+		<th>客户名称</th>
+		<td id="names">聪海信息科技有限公司</td>
+	</tr>
+	</table>
+<br />
+<table class="data_list_table" id="tables">
+
+
+	</table>
+</body>
+</html>

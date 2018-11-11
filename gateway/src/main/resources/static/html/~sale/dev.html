@@ -1,0 +1,177 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+	<style>
+		.list_data_op{
+			width: 180px;
+		}
+		#table tr td{
+			width: 50px;
+		}
+	</style>
+<meta charset="UTF-8">
+<link href="../css/style.css" rel="stylesheet" type="text/css">
+<script src="../script/common.js"></script>
+	<script src="../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+            $(function () {
+                $.ajax({
+                    url: "../../../api3/chances",
+                    type: "GET",
+                    success: function (obj) {
+                        tables(obj);
+                    }
+                });
+            });
+        });
+        function info(No) {
+            var pageNo = No;
+            var pageSize = $("#pageSize").val();
+            var data = "pageNo=" + No + "&pageSize=" + pageSize;
+            var names = $("#names").val();
+            if (names != null && names != "") {
+                data += "&Chc_cust_name=" + names;
+            }
+            var gai = $("#gai").val();
+            if (gai != null && gai != "") {
+                data += "&chc_title=" + gai;
+            }
+            var lianxi = $("#lianxi").val();
+            if (lianxi != null && lianxi != "") {
+                data += "&chc_linkman=" + lianxi;
+            }
+            $.ajax({
+                url: "../../../api3/chances",
+                data: data,
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        }
+        function to1(no) {
+            localStorage.setItem("Chc_id",no);
+            to('dev_plan.html');
+        }
+        function to2(no) {
+            localStorage.setItem("Chc_id",no);
+            to('dev_execute.html');
+        }
+        function zhongzhi(Chc_id) {
+            var chc_status="3";
+            var data="{\"chc_status\":\""+chc_status+"\",\"Chc_id\":"+Chc_id+"}";
+            $.ajax({
+                url:"../../../api3/updateStatus",
+                data:data,
+                type:"POST",
+                contentType:"application/json;charset=utf-8",
+                success:function (obj) {
+                    if(obj.code==0){
+                        alert("用户开发成功!");
+                        reload();
+                    }else{
+                        alert(obj.msg);
+                    }
+                }
+            });
+        }
+        function xiangQing(chc_id) {
+            localStorage.setItem("Chc_id",chc_id);
+            to('dev_detail.html');
+        }
+        function tables(obj) {
+            var table = $("#table");
+            var str = "<tr>\n" +
+                "\t\t<th>编号</th>\n" +
+                "\t\t<th>客户名称</th>\n" +
+                "\t\t<th>概要</th>\n" +
+                "\t\t<th>联系人</th>\n" +
+                "\t\t<th>联系人电话</th>\n" +
+                "\t\t<th>创建时间</th>\n" +
+                "\t\t<th>状态</th>" +
+				"\t\t<th>操作</th>\n" +
+                "\t</tr>";
+            for (var i = 0; i < obj.result.list.length; i++) {
+                var chc_status=obj.result.list[i].chc_status;
+                var status="";
+                if(obj.result.list[i].chc_status==1){
+                    status="已归档";
+				}else if(obj.result.list[i].chc_status==2){
+                    status="开发中";
+				}else if(obj.result.list[i].chc_status==3){
+                    status="开发成功";
+                }else if(obj.result.list[i].chc_status==4){
+                    status="开发失败";
+                }
+                str +='<tr>\n' +
+                    '\t\t<td class="list_data_number">'+obj.result.list[i].chc_id+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].chc_cust_name+'</td>\n' +
+                    '\t\t<td class="list_data_ltext">'+obj.result.list[i].chc_title+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].chc_linkman+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].chc_tel+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].chc_create_date+'</td>\n' +
+                    '<td class="list_data_text">'+status+'</td>';
+                if(chc_status!=4&&chc_status!=3){
+                    str+='<td class="list_data_op">\n' +
+                        '\t\t\t<img onclick="to1('+obj.result.list[i].chc_id+')" title="制定计划" src="../images/bt_plan.gif" class="op_button" />' +
+                        '\t\t\t<img onclick="to2('+obj.result.list[i].chc_id+')" title="执行计划" src="../images/bt_feedback.gif" class="op_button" />' +
+                        '\t\t\t<img onclick="zhongzhi('+obj.result.list[i].chc_id+')" title="开发成功" src="../images/bt_yes.gif" class="op_button" />' +
+                        '\t\t</td>' +
+                        '\t</tr>';
+				}else{
+                    str+='<td class="list_data_op">\n' +
+                        '\t\t\t<img onclick="xiangQing('+obj.result.list[i].chc_id+')" title="查看" src="../images/bt_detail.gif" class="op_button" />\n' +
+                        '\t\t</td>';
+				}
+
+            }
+            table.empty().append(str);
+            str = '<tr>\n' +
+                '        <th colspan="7" class="pager">\n' +
+                '            <div class="pager">\n' +
+                '                共' + obj.result.count + '条记录 每页<input id="pageSize" value=\"' + obj.result.pageSize + '\" size="2"/>条\n' +
+                '                第<input value="' + obj.result.pageNo + '" size="2"/>页/共' + obj.result.pageCount + '页\n' +
+                '                <a href="#" onclick="info(' + 1 + ')">第一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo - 1) + ')">上一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo + 1) + ')">下一页</a>\n' +
+                '                <a href="#" onclick="info(' + obj.result.pageCount + ')">最后一页</a>\n' +
+                '                转到<input value=\''+obj.result.pageNo+'\' id="tiao" size="2"/>页\n' +
+                '                <button width="20" id="go" >GO</button>\n' +
+                '            </div>\n' +
+                '        </th>\n' +
+                '    </tr>';
+            table.append(str);
+            $("#go").click(function () {
+                var tiao=$("#tiao").val();
+                info(tiao);
+            });
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户开发计划</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="info(1);">查询</button>
+	</div>
+<table class="query_form_table">
+	<tr>
+		<th>客户名称</th>
+		<td><input id="names" /></td>
+		<th>概要</th>
+		<td><input id="gai" /></td>
+		<th>联系人</th>
+		<td>
+			<input id="lianxi" name="T1" size="20" />
+		</td>
+	</tr>
+	</table>
+<br />
+<table id="table" class="data_list_table">
+
+</table>
+</body>
+</html>

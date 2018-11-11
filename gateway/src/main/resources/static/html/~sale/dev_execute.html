@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+<link href="../css/style.css" rel="stylesheet" type="text/css">
+<script src="../script/common.js"></script>
+	<script src="../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        var Chc_id=localStorage.getItem("Chc_id");
+        $(function () {
+            $.ajax({
+                url: "../../../api3/chances/"+Chc_id,
+                type: "GET",
+                success: function (obj) {
+                    $("#No").html(Chc_id);
+                    $("#jihui").html(obj.result.chc_source);
+                    $("#names").html(obj.result.chc_cust_name);
+                    $("#lv").html(obj.result.chc_rate);
+                    $("#gai").html(obj.result.chc_title);
+                    $("#lianxi").html(obj.result.chc_linkman);
+                    $("#phone").html(obj.result.chc_tel);
+                    $("#miaoshu").html(obj.result.chc_desc);
+                    $("#username").html(obj.result.chc_create_by);
+                    $("#time").html(obj.result.chc_create_date);
+                    $("#maneger").html(obj.result.chc_due_to);
+                    $("#zhipaiTime").html(obj.result.chc_due_date);
+                }
+            });
+            $.ajax({
+                url:"../../../api3/plans/"+Chc_id,
+                type:"GET",
+                success:function (obj) {
+                    if(obj.result.length!=0) {
+                        var str = '<tr>\n' +
+                            '\t\t<th>日期</th>\n' +
+                            '\t\t<th>计划</th>\n' +
+                            '\t\t<th>执行效果</th>\n' +
+                            '\t</tr>';
+                        for (var i = 0; i < obj.result.length; i++) {
+                            str += '<tr>\n' +
+                                '\t\t<td class="list_data_text">'+obj.result[i].pla_date+'</td>\n' +
+                                '\t\t<td class="list_data_ltext">'+obj.result[i].pla_todo+'</td>\n' +
+                                '\t\t<td class="list_data_ltext"><input id="result'+obj.result[i].pla_id+'" value="'+obj.result[i].pla_result+'" />　\n' +
+                                '\t<button class="common_button" onclick=\'baocun(obj.result[i].pla_id)\'>保存</button>\n' +
+                                '\t\t</td>\n' +
+                                '\t</tr>';
+                        }
+                        $("#table1").empty().append(str);
+                    }
+                }
+            });
+        });
+        function baocun(pla_id) {
+            var pla_result=$("#result"+pla_id).val();
+            var data="{\"Pla_result\":\""+pla_result+"\",\"Pla_id\":"+pla_id+"}";
+            $.ajax({
+				url:"../../../api3/updateResult",
+				type:"POST",
+				data:data,
+				contentType:"application/json;charset=utf-8",
+				success:function (obj) {
+					if(obj.code==0){
+					    alert("保存成功!");
+						to("dev.html");
+					}else{
+					    alert(obj.msg);
+					}
+                }
+			})
+        }
+        function zhongzhi() {
+            var chc_status="4";
+            var data="{\"chc_status\":\""+chc_status+"\",\"Chc_id\":"+Chc_id+"}";
+            $.ajax({
+				url:"../../../api3/updateStatus",
+				data:data,
+				type:"POST",
+				contentType:"application/json;charset=utf-8",
+				success:function (obj) {
+					if(obj.code==0){
+					    alert("开发失败，已归档!");
+						to("dev.html");
+					}else{
+					    alert(obj.msg);
+					}
+                }
+			});
+        }
+        function chenggong() {
+            var chc_status="3";
+            var data="{\"chc_status\":\""+chc_status+"\",\"Chc_id\":"+Chc_id+"}";
+            $.ajax({
+                url:"../../../api3/updateStatus",
+                data:data,
+                type:"POST",
+                contentType:"application/json;charset=utf-8",
+                success:function (obj) {
+                    if(obj.code==0){
+                        alert("用户开发成功!");
+                        to("dev.html");
+                    }else{
+                        alert(obj.msg);
+                    }
+                }
+            });
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户开发计划 &gt; 执行计划</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="zhongzhi();">终止开发</button>
+	<button class="common_button" onclick="back();">返回</button>
+	<button class="common_button" onclick="to('dev_plan.html');">制定计划</button>
+	<button class="common_button" onclick="chenggong();">开发成功</button>
+
+	</div>
+<table class="query_form_table">
+	<tr>
+		<th>编号</th>
+		<td id="No">1</td>
+		<th>机会来源</th>
+		<td id="jihui">
+			　</td>
+	</tr>
+	<tr>
+		<th>客户名称</th>
+		<td id="names">睿智电脑</td>
+		<th>成功机率（%）</th>
+		<td id="lv">&nbsp;70</td>
+	</tr>
+	<tr>
+		<th>概要</th>
+		<td id="gai" colspan="3">采购笔记本电脑意向</td>
+	</tr>
+	<tr>
+		<th>联系人</th>
+		<td id="lianxi">刘先生</td>
+		<th>联系人电话</th>
+		<td id="phone">13729239239</td>
+	</tr>
+	<tr>
+		<th>机会描述</th>
+		<td id="miaoshu" colspan="3">...</td>
+	</tr>
+	<tr>
+		<th>创建人</th>
+		<td id="username">刘颖</td>
+		<th>创建时间</th>
+		<td id="time">2007年12月06日 16时09分08秒</td>
+	</tr>
+	<tr>
+		<th>指派给</th>
+		<td id="maneger">
+			郭小美</td>
+		<th>指派时间</th>
+		<td id="zhipaiTime">
+			2007年12月07日 09时00分38秒</td>
+	</tr>
+</table>
+<br />
+<table class="data_list_table" id="table1">
+
+
+	</table>
+</body>
+</html>

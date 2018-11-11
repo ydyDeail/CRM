@@ -1,0 +1,90 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+	<style>
+		#table tr td{
+			width: 50px;
+		}
+	</style>
+<link href="../css/style.css" rel="stylesheet" type="text/css">
+<script src="../script/common.js"></script>
+	<script src="../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+			$.ajax({
+                url: "../../../api5/getAllFuWu?dowmtime=0",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var str1="<option value='0'>全部</option>";
+                    for(var j=10;j<21;j++){
+                        str1+="<option value='20"+j+"'>20"+j+"</option>";
+					}
+					$("#time").append(str1);
+                    table(obj);
+                }
+			});
+        });
+		function table(obj) {
+            var str = "<tr>\n" +
+                "\t\t<th>编号</th>\n" +
+                "\t\t<th>条目</th>\n" +
+                "\t\t<th>服务数量</th>\n" +
+                "\t</tr>";
+            for (var i = 0; i < obj.result.length; i++) {
+                str += "<tr>\n" +
+                    "\t\t<td class=\"list_data_number\">"+(i+1)+"</td>\n" +
+                    "\t\t<td class=\"list_data_text\">"+obj.result[i].svr_type+"</td>\n" +
+                    "\t\t<td class=\"list_data_number\">"+obj.result[i].num+"</td> \n" +
+                    "\t</tr>";
+            }
+            $("#table").empty().append(str);
+        }
+        function select() {
+			var dowmtime=$("#time").val();
+            $.ajax({
+                url: "../../../api5/getAllFuWu?dowmtime="+dowmtime,
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    if(obj.result.length==0){
+                        $("#table").empty();
+                        $("#erreo").html("该年份下没有服务信息，请查看详细信息，谢谢！");
+					}else{
+                        $("#erreo").html("");
+                        table(obj);
+					}
+                }
+            });
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户服务分析</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="select();">查询</button>
+	</div>
+<table class="query_form_table">
+	<tr>
+		<th>年份</th>
+		<td>
+			<select id="time">
+			</select>
+		</td>
+		<th>&nbsp;</th>
+		<td>
+			&nbsp;
+		</td>
+	</tr>
+	</table>
+<br />
+<table id="table" class="data_list_table">
+
+	</table>
+<h2 id="erreo" style="text-align: center;color: red"></h2>
+</body>
+</html>

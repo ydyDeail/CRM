@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+<link href="../../css/style.css" rel="stylesheet" type="text/css">
+<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+            var token=localStorage.getItem("token");
+            var url="../../../api6/getUser?token="+token;
+            $.ajax({
+                url:url,
+                type:"GET",
+                success:function (obj) {
+                    $("#username").val(obj.result);
+                }
+            });
+			$.ajax({
+				url:"../../../api6/getAllService",
+				type:"GET",
+				dataType:"JSON",
+				success:function (obj) {
+                    var str = "<option>请选择...</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        str += "<option>"+obj.result[i].dict_item+"</option>";
+                    }
+                    $("#service").append(str);
+                }
+			});
+			$.ajax({
+                url:"../../../api6/getNewId",
+                type:"GET",
+                success:function (obj) {
+                    $("#No").val(obj.result+1);
+                }
+			});
+            $.ajax({
+                url:"../../../api6/custname",
+                type:"GET",
+                success:function (obj) {
+                    var str="<option>请选择...</option>";
+                    for(var i=0;i<obj.result.length;i++){
+                        str+="<option value='"+obj.result[i].cust_no+"'>"+obj.result[i].cust_name+"</option>"
+                    }
+                    $("#custname").empty().append(str);
+                }
+            });
+        });
+        function baocun() {
+            var svr_type=$("#service").find("option:selected").text();
+            var svr_title=$("#gai").val();
+            var svr_cust_name=$("#custname").find("option:selected").text();
+            var svr_cust_no=$("#custname").val();
+            var svr_request=$("#qingqiu").val();
+            var svr_create_by=$("#username").val();
+            $.ajax({
+                url:"../../../api6/findUser/"+svr_create_by,
+                type:"GET",
+                success:function (obj) {
+                    $("#userId").val(obj.result);
+                }
+            });
+            var svr_create_id=$("#userId").val();
+            var data="";
+            if(svr_type!="请选择..."&&svr_cust_name!="请选择..."){
+                data="{\"svr_type\":\""+svr_type+"\",\"svr_title\":\""+svr_title+"\",\"svr_cust_no\":\""+svr_cust_no+"\",\"svr_cust_name\":\""+svr_cust_name+"\",\"svr_request\":\""+svr_request+"\",\"svr_create_id\":"+svr_create_id+",\"svr_create_by\":\""+svr_create_by+"\"}";
+            }else {
+                alert("请选择类型！")
+            }
+            alert(data);
+
+            $.ajax({
+                url:"../../../api6/addService",
+                data:data,
+                type:"POST",
+                contentType:"application/json;charset=utf-8",
+                dataType:"JSON",
+                success:function (obj) {
+                    alert("添加成功！")
+                }
+            })
+        }
+	</script>
+</head>
+<body>
+<input id="userId" type="hidden">
+<div class="page_title">客户服务管理 > 服务创建</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="baocun()">保存</button>
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>编号</th>
+		<td><input id="No" disabled /></td>
+		<th>服务类型</th>
+		<td>
+			<select id="service">
+
+			</select><span class="red_star">*</span>
+		</td>
+	</tr>
+	<tr>
+		<th>概要</th>
+		<td colspan="3"><input id="gai"  size="53" /><span class="red_star">*</span></td>
+	</tr>	
+	<tr>
+		<th>客户</th>
+		<td><select id="custname"></select></td>
+		<th>状态</th>
+		<td>新创建</td>
+	</tr>	
+	<tr>
+		<th>服务请求</th>
+		<td colspan="3"><textarea id="qingqiu" rows="6" cols="50"></textarea><span class="red_star">*</span></td>
+	</tr>
+	<tr>
+		<th>创建人</th>
+		<td><input id="username" name="T19" value="刘颖" readonly size="20" /><span class="red_star">*</span></td>
+		<th>创建时间</th>
+		<td><input  id="t1" name="T15" readonly size="20" /><span class="red_star">*</span></td>
+	</tr>
+	</table>
+<br />
+<script>
+	setCurTime('t1');
+</script>
+</body>
+</html>

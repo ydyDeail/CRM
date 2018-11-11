@@ -1,0 +1,35 @@
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://localhost:9000/eureka/
+server:
+  port: 8100
+spring:
+  application:
+    name: gateway
+zuul:
+  routes:
+    user-service:
+      path: /api1/**
+      serviceId: user-service
+    customer-service:
+      path: /api2/**
+      serviceId: customer-service
+    chance-service:
+      path: /api3/**
+      serviceId: chance-service
+    jichu-service:
+      path: /api4/**
+      serviceId: jichu-service
+    tongji-service:
+      path: /api5/**
+      serviceId: tongji-service
+    service-service:
+      path: /api6/**
+      serviceId: service-service
+  host:
+    connect-timeout-millis: 10000
+    socket-timeout-millis: 60000
+
+
+

@@ -1,0 +1,89 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+<link href="../../css/style.css" rel="stylesheet" type="text/css">
+<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+		$(function () {
+		    var lst_id=localStorage.getItem("lst_id");
+            $.ajax({
+                url: "../../../api2/getLostById/"+lst_id,
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    $("#No").html(obj.result.lst_id);
+                    $("#name").html(obj.result.lst_cust_name);
+                    $("#jingli").html(obj.result.lst_manager_name);
+                    $("#time").html(obj.result.lst_last_order_date);
+                    $("#zanhuan").html(obj.result.lst_delay);
+                }
+            });
+        });
+		function baocun() {
+		    var lst_id=$("#No").html();
+		    var Lst_reason=$("#yuanyin").val();
+		    if(Lst_reason!=null&&Lst_reason!=""){
+		        var data="{\"lst_id\":"+lst_id+",\"lst_reason\":\""+Lst_reason+"\"}";
+                $.ajax({
+                    url:"../../../api2/qupdateLost",
+                    data:data,
+                    type:"POST",
+                    contentType:"application/json;charset=utf-8",
+                    dataType:"JSON",
+                    success:function (obj) {
+                        if(obj.result==1){
+                            alert("保存成功！");
+                            to('list.html');
+						}
+                    }
+                })
+			}else{
+		        alert("请描述流失原因!")
+			}
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户流失管理 &gt; 确认流失</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	
+	<button class="common_button" onclick="back();">返回</button>
+	<button class="common_button" onclick="to('relay.html');">暂缓流失</button>
+	<button class="common_button" onclick="baocun();">保存</button>
+</div>
+<table class="query_form_table">
+	<tr>
+		<th>编号</th>
+		<td id="No">1</td>
+		<th>客户</th>
+		<td id="name">阳光实业</td>
+	</tr>
+	<tr>
+		<th>客户经理</th>
+		<td id="jingli">
+			球球</td>
+		<th>上次下单时间</th>
+		<td id="time">
+			2005年12月07日</td>
+	</tr>
+	<tr>
+		<th>暂缓措施</th>
+		<td id="zanhuan" colspan="3">
+打电话给客户了解不再购买本公司产品的原因。<br>
+发送新产品目录给客户。
+</td>
+	</tr>	
+	<tr>
+		<th>流失原因</th>
+		<td colspan="3">
+			<textarea id="yuanyin" rows="6" cols="50"></textarea><span class="red_star">*</span></td>
+	</tr>
+</table>
+<br />
+</body>
+</html>

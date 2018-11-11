@@ -1,0 +1,157 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+	<style>
+		#table tr td{
+			width: 50px;
+		}
+	</style>
+<link href="../css/style.css" rel="stylesheet" type="text/css">
+<script src="../script/common.js"></script>
+	<script src="../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url: "../../../api5/getAllLevel",
+                type: "GET",
+                dataType: "JSON",
+                success: function (obj) {
+                    var str = "<tr>\n" +
+                        "\t\t<th>编号</th>\n" +
+                        "\t\t<th>等级</th>\n" +
+                        "\t\t<th>客户数量</th>\n" +
+                        "\t</tr>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        str += "<tr>\n" +
+                            "\t\t<td class=\"list_data_number\">"+(i+1)+"</td>\n" +
+                            "\t\t<td class=\"list_data_text\">"+obj.result[i].cust_level_label+"</td>\n" +
+                            "\t\t<td class=\"list_data_number\">"+obj.result[i].cll+"</td>\n" +
+                            "\t</tr>";
+                    }
+                    $("#table").append(str);
+                }
+            });
+        });
+        function info() {
+			var lei=$("#lei").find("option:selected").text();
+            if(lei=="按等级"){
+                $.ajax({
+                    url: "../../../api5/getAllLevel",
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (obj) {
+                        var str = "<tr>\n" +
+                            "\t\t<th>编号</th>\n" +
+                            "\t\t<th>等级</th>\n" +
+                            "\t\t<th>客户数量</th>\n" +
+                            "\t</tr>";
+                        for (var i = 0; i < obj.result.length; i++) {
+                            str += "<tr>\n" +
+                                "\t\t<td class=\"list_data_number\">"+(i+1)+"</td>\n" +
+                                "\t\t<td class=\"list_data_text\">"+obj.result[i].cust_level_label+"</td>\n" +
+                                "\t\t<td class=\"list_data_number\">"+obj.result[i].cll+"</td>\n" +
+                                "\t</tr>";
+                        }
+                        $("#table").empty().append(str);
+                    }
+                });
+            }
+			if(lei=="按信用度"){
+                $.ajax({
+                    url: "../../../api5/getAllXinYong",
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (obj) {
+                        var str = "<tr>\n" +
+                            "\t\t<th>编号</th>\n" +
+                            "\t\t<th>等级</th>\n" +
+                            "\t\t<th>客户数量</th>\n" +
+                            "\t</tr>";
+                        for (var i = 0; i < obj.result.length; i++) {
+                            var xin="☆";
+                            if(obj.result[i].cust_satisfy==2){
+                                xin="☆☆";
+							}else if(obj.result[i].cust_satisfy==3){
+                                xin="☆☆☆";
+							}else if(obj.result[i].cust_satisfy==4){
+                                xin="☆☆☆☆";
+                            }else if(obj.result[i].cust_satisfy==5){
+                                xin="☆☆☆☆☆";
+                            }
+                            str += "<tr>\n" +
+                                "\t\t<td class=\"list_data_number\">"+(i+1)+"</td>\n" +
+                                "\t\t<td class=\"list_data_text\">"+xin+"</td>\n" +
+                                "\t\t<td class=\"list_data_number\">"+obj.result[i].cs+"</td>\n" +
+                                "\t</tr>";
+                        }
+                        $("#table").empty().append(str);
+                    }
+                });
+			}
+			if(lei=="按满意度"){
+                $.ajax({
+                    url: "../../../api5/getAllManYi",
+                    type: "GET",
+                    dataType: "JSON",
+                    success: function (obj) {
+                        var str = "<tr>\n" +
+                            "\t\t<th>编号</th>\n" +
+                            "\t\t<th>等级</th>\n" +
+                            "\t\t<th>客户数量</th>\n" +
+                            "\t</tr>";
+                        for (var i = 0; i < obj.result.length; i++) {
+                            var xin="☆";
+                            if(obj.result[i].cust_credit==2){
+                                xin="☆☆";
+                            }else if(obj.result[i].cust_credit==3){
+                                xin="☆☆☆";
+                            }else if(obj.result[i].cust_credit==4){
+                                xin="☆☆☆☆";
+                            }else if(obj.result[i].cust_credit==5){
+                                xin="☆☆☆☆☆";
+                            }
+                            str += "<tr>\n" +
+                                "\t\t<td class=\"list_data_number\">"+(i+1)+"</td>\n" +
+                                "\t\t<td class=\"list_data_text\">"+xin+"</td>\n" +
+                                "\t\t<td class=\"list_data_number\">"+obj.result[i].cc+"</td>\n" +
+                                "\t</tr>";
+                        }
+                        $("#table").empty().append(str);
+                    }
+                });
+			}
+        }
+	</script>
+</head>
+<body>
+
+<div class="page_title">客户构成分析</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="info();">查询</button>
+	</div>
+<table class="query_form_table">
+	<tr>
+		<th>报表方式</th>
+		<td>
+			<select id="lei">
+				<option>按等级</option>
+				<option>按信用度</option>
+				<option>按满意度</option>
+			</select>
+		</td>
+
+	<th>&nbsp;</th>
+		<td>
+			&nbsp;
+		</td>
+			</tr>
+	</table>
+<br />
+<table id="table" class="data_list_table">
+
+	</table>
+</body>
+</html>

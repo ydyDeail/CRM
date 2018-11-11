@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+<title>jb-aptech毕业设计项目</title>
+<meta charset="UTF-8">
+	<style>
+		#table tr td{
+			width: 50px;
+		}
+	</style>
+<link href="../../css/style.css" rel="stylesheet" type="text/css">
+<script src="../../script/common.js"></script>
+	<script src="../../../js/jquery-1.8.3.js"></script>
+	<script type="text/javascript">
+        $(function () {
+            $.ajax({
+                url:"../../../api6/getAllService",
+                type:"GET",
+                dataType:"JSON",
+                success:function (obj) {
+                    var str = "<option>全部</option>";
+                    for (var i = 0; i < obj.result.length; i++) {
+                        str += "<option>"+obj.result[i].dict_item+"</option>";
+                    }
+                    $("#service").append(str);
+                }
+            });
+            $.ajax({
+                url: "../../../api6/getFenPei?svr_type=全部&svr_status=已分配",
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+            $(".riqi").click(function(){
+                WdatePicker({
+                    highLineWeekDay:true //周末高亮
+                    ,readOnly:true      //只读，只可用控件input中 修改内容
+                    ,dateFmt:'yyyy-MM-dd'
+                });
+            });
+
+        });
+        function info(No) {
+            var pageNo = No;
+            var pageSize = $("#pageSize").val();
+            var data = "pageNo=" + No + "&pageSize=" + pageSize;
+            var svr_cust_name = $("#name").val();
+            if (svr_cust_name != null && svr_cust_name != "") {
+                data += "&svr_cust_name=" + svr_cust_name;
+            }
+            var gai = $("#gai").val();
+            if (gai != null && gai != "") {
+                data += "&svr_request=" + gai;
+            }
+            var svr_type = $("#service").find("option:selected").text();
+            if (svr_type != "全部") {
+                data += "&svr_type=" + svr_type;
+            }else{
+                data += "&svr_type=" + "";
+            }
+            var up = $("#up").val();
+            if (up != null && up != "") {
+                data += "&up=" + up;
+            }
+            var down = $("#down").val();
+            if (down != null && down != "") {
+                data += "&down=" + down;
+            }
+            $.ajax({
+                url: "../../../api6/getFenPei?svr_status=已分配",
+                data: data,
+                type: "GET",
+                success: function (obj) {
+                    tables(obj);
+                }
+            });
+        }
+        function tables(obj) {
+            var table = $("#table");
+            var str = "<tr>\n" +
+                "\t\t<th>编号</th>\n" +
+                "\t\t<th>客户</th>\n" +
+                "\t\t<th>概要</th>\n" +
+                "\t\t<th>服务类型</th>\n" +
+                "\t\t<th>创建人</th>\n" +
+                "\t\t<th>创建日期</th>\n" +
+                "\t\t<th>操作</th>\n" +
+                "\t</tr>";
+            for (var i = 0; i < obj.result.list.length; i++) {
+                str +='<tr>\n' +
+                    '\t\t<td class="list_data_number">'+obj.result.list[i].svr_id+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].svr_cust_name+'</td>\n' +
+                    '\t\t<td class="list_data_ltext">'+obj.result.list[i].svr_title+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].svr_type+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].svr_create_by+'</td>\n' +
+                    '\t\t<td class="list_data_text">'+obj.result.list[i].svr_create_date+'</td>\n' +
+                    '<td class="list_data_op">\n' +
+                    '\t\t\t\t\t\t\n' +
+                    '\t\t\t<img onclick="to(\'deal_detail.html\');" title="处理" src="../../images/bt_deal.gif" class="op_button" />  \n' +
+                    '\t\t\t\n' +
+                    '\t\t</td>' +
+					'\t</tr>';
+            }
+            table.empty().append(str);
+            str = '<tr>\n' +
+                '        <th colspan="7" class="pager">\n' +
+                '            <div class="pager">\n' +
+                '                共' + obj.result.count + '条记录 每页<input id="pageSize" value=\"' + obj.result.pageSize + '\" size="2"/>条\n' +
+                '                第<input value="' + obj.result.pageNo + '" size="2"/>页/共' + obj.result.pageCount + '页\n' +
+                '                <a href="#" onclick="info(' + 1 + ')">第一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo - 1) + ')">上一页</a>\n' +
+                '                <a href="#" onclick="info(' + (obj.result.pageNo + 1) + ')">下一页</a>\n' +
+                '                <a href="#" onclick="info(' + obj.result.pageCount + ')">最后一页</a>\n' +
+                '                转到<input value=\''+obj.result.pageNo+'\' id="tiao" size="2"/>页\n' +
+                '                <button width="20" id="go" >GO</button>\n' +
+                '            </div>\n' +
+                '        </th>\n' +
+                '    </tr>';
+            table.append(str);
+            $("#go").click(function () {
+                var tiao=$("#tiao").val();
+                info(tiao);
+            });
+        }
+	</script>
+</head>
+<body>
+<div class="page_title">客户服务管理 > 服务分配</div>
+<div class="button_bar">
+	<button class="common_button" onclick="help('');">帮助</button>
+	<button class="common_button" onclick="info(1)">查询</button>
+</div>
+<table class="query_form_table" height="53">
+	<tr>
+		<th height="28">客户</th>
+		<td><input id="name" /></td>
+		<th height="28">概要</th>
+		<td><input id="gai" /></td>
+		<th height="28">服务类型</th>
+		<td>
+			<select id="service" name="D1">
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<th height="22">创建日期</th>
+		<td colspan="3">
+			<input id="down" class="riqi" name="T2" size="10" /> - <input id="up" class="riqi" name="T1" size="10" /></td>
+		<th height="22">状态</th>
+		<td>
+			<select name="D1">
+				<option selected>已分配</option>
+			</select>
+		</td>
+	</tr>
+</table>
+<br />
+<table id="table" class="data_list_table">
+
+</table>
+</body>
+</html>
